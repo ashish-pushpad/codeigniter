@@ -1,0 +1,118 @@
+			
+
+
+		Code Ignitor Doc --> 
+				
+				Routes Define --> 	
+						$routes->get('users', 'Users::list'); // similar like router.get('/users',User.list);	
+
+					$routes->get('journals', 'Blogs'); // here the journals is path and the Blogs is a file in the Controller where 										 all the controol fun is define if we not specify the route it will call 										    	the index() fun by default 
+
+					$routes->get('blog/:any', 'Blogs::users/$1'); // it will call the user fun in the Blogs controller file with  														 paramas value of params like this 
+																 // blog/ash then is will pass the users(user_name (ash))
+																 if there othere parameter then it will users(user_name, id )
+																 url look like /blog/ash/34
+
+					value that can pass throe the router are --> 
+
+					ID (number)	(:num)
+					slug (seo url)	(:any)
+					username	(:alphanum)
+					strict letters	(:alpha)
+					same as any (:segment)									// regex
+					also can pass the regex like this $routes->get('product/([a-z]+)', 'Catalog::productLookup/$1');
+					
+
+					to user the methods --> 
+
+			 			$routes->get('product/(:num)', 'Catalog::productLookupByID/$1');
+						$routes->post('products', 'Product::feature');
+						$routes->put('products/1', 'Product::feature');
+						$routes->delete('products/1', 'Product::feature');
+						$routes->add('from', 'to', $options);
+						$routes->get('from', 'to', $options);
+						$routes->post('from', 'to', $options);
+						$routes->put('from', 'to', $options);
+						$routes->head('from', 'to', $options);
+						$routes->options('from', 'to', $options);
+						$routes->delete('from', 'to', $options);
+						$routes->patch('from', 'to', $options);
+						$routes->match(['GET', 'PUT'], 'from', 'to', $options);
+						$routes->resource('photos', $options);
+						$routes->map($array, $options);
+						$routes->group('name', $options, static function () {});
+
+						// can be multiple methods for single route 
+										//methods 		// url		// contoller to call
+						$routes->match(['GET', 'PUT'], 'products', 'Product::feature'); // 
+
+
+					to define that where it have to watch for any specific route
+
+											<?php
+
+						// Routes to \App\Controllers\Api\Users::update()
+						$routes->post('api/users', 'Api\Users::update'); // witout back slash it will fo the default  path 																\App\Controllers\
+
+						If you put \ at the beginning, it is treated as a fully qualified class name:
+
+						<?php
+
+						// Routes to \Acme\Blog\Controllers\Home::list()
+						$routes->get('blog', '\Acme\Blog\Controllers\Home::list'); // it became the fully static path not go in the App/															controller
+						You can also specify the namespace with the namespace option:
+
+						<?php
+
+						// Routes to \Admin\Users::index()
+						$routes->get('admin/users', 'Users::index', ['namespace' => 'Admin']); // to specify the folder path \Admin\Users::index()
+
+
+						newly syntax --> $routes->get('/', [\App\Controllers\Home::class, 'index']); // [ControllerClass, methodName]
+
+
+
+					namespace -------> 
+							MERN	             CodeIgniter
+						folder import path	    namespace
+						require/import	        use / full class path
+
+					using the use keyword ---> 	
+
+						$routes->get('/', [\App\Controllers\Home::class, 'index']);
+
+						write like this in file --> 
+
+							use App\Controllers\Home;
+
+							$routes->get('/', [Home::class, 'index']); // If you forget to add use App\Controllers\Home;, the 															controller classname is interpreted as \Home, not 															App\Controllers\Home.
+
+
+					to send the value in array router --> 
+
+						$routes->get('product/(:num)/(:num)', [Product::class, 'index']);
+						// The above code is the same as the following:
+						$routes->get('product/(:num)/(:num)', 'Product::index/$1/$2');
+
+
+					to send the responce withing the reouter ---> 
+
+						use App\Libraries\RSSFeeder;
+
+						$routes->get('feed', static function () {
+						$rss = new RSSFeeder();
+
+						return $rss->feed('general');
+						});
+
+
+					just to rendet the page --> 
+						$routes->view('about', 'pages/about');
+
+
+
+
+					to add the middleware  --> 
+						$routes->get('admin', 'AdminController::index', ['filter' => 'auth']);
+
+
