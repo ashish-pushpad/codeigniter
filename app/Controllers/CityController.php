@@ -3,8 +3,12 @@
 namespace App\Controllers;
 
 use App\Models\CityModel ;
+use CodeIgniter\HTTP\RequestInterface;
+use CodeIgniter\HTTP\ResponseInterface;
+use Psr\Log\LoggerInterface;
 
-class CityController extends BaseControlle{
+class CityController extends BaseController{
+        protected $helpers = ['encryption'];
         protected  $cityModel;
         public function initController(
             RequestInterface $request,
@@ -21,7 +25,7 @@ class CityController extends BaseControlle{
             try{
                 $cityName= $this->request->getPost("name");
                 $state_id = $this->request->getPost('state_id');
-
+                $state_id = decryptId($state_id);
                 $result = $this->cityModel->insert(['name'=>$cityName,'state_id'=>$state_id]);
 
                 if($result){
@@ -31,7 +35,7 @@ class CityController extends BaseControlle{
                     ]);
                 }
             }catch (\Exception $e){
-                log_message('Error',$e->getMessage());
+                log_message('error',$e->getMessage());
                 return $this->response->setStatusCode(500)->setJSON([
                     "status"=>false,
                     "message"=>"Server Error"
@@ -42,9 +46,10 @@ class CityController extends BaseControlle{
 
         public function updateCity($id){
             try{
-                $updatedData = $this->request->getPost("updatedCityName");
+                $id = decryptId($id);
+                $updatedData = $this->request->getRawInput();
 
-                $newData = $this->cityModel->update($id,['state'=>$updatedData]);
+                $newData = $this->cityModel->update($id,['name'=>$updatedData['updatedCityName']]);
                 if($newData){
                     return $this->response->setStatusCode(201)->setJSON([
                         'status'=>true,
@@ -53,7 +58,7 @@ class CityController extends BaseControlle{
                 }
 
             }catch(\Exception  $e){
-                log_message("Error to updatecity",$e->getMessage());
+                log_message("error",$e->getMessage());
                 return $this->response->setStatusCode(500)->setJSON([
                     'success'=>false,
                     'message'=>"Internal Server Error"
@@ -64,18 +69,19 @@ class CityController extends BaseControlle{
 
         public function getCityByState($id) {
             try{
-                $allStates = $this->cityModel
+                $id = decryptId($id);
+                $allCity = $this->cityModel
                 ->select('cities.*, states.state as state_name')
-                ->join('state', 'states.id = city.state_id')
+                ->join('states', 'states.id = cities.state_id')
                 ->findAll();
-
+                $allCity=encryptIds($allCity);
                 return $this->response->setStatusCode(200)->setJSON([
-                    "data"=>$allStates,
+                    "data"=>$allCity,
                     'success'=>true
                 ]);
     
             }catch(\Exception $e){
-                log_message("Error to getStateByCountry ",$e.getMessage());
+                log_message("error",$e->getMessage());
                 return $this->response->setStatusCode(500)->setJSON([
                     'status'=>false,
                     'message'=>"Internal Server Error"
@@ -84,8 +90,9 @@ class CityController extends BaseControlle{
         }
 
 
-        public function deleteState($id){
+        public function deleteCity($id){
             try{
+                $id = decryptId($id);
                 $state = $this->cityModel->find($id);
                 if(!$state) return $this->response->setStatusCode(404)->setJSON([
                     "success"=>false,
@@ -101,7 +108,7 @@ class CityController extends BaseControlle{
                 ]);
 
             }catch(\Exception $e){
-                log_message("Error to Delete the State ",$e->getMessage());
+                log_message("error",$e->getMessage());
                 return $this->response->setStatusCode(500)->setJSON([
                     'success'=>false,
                     'message'=>"Internal Server Error Try Again Later !!"

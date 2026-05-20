@@ -49,7 +49,7 @@ class StateController extends BaseController{
                 $id = decryptId($id);
                 $updatedData = $this->request->getRawInput();
 
-                $newData = $this->stateModel->update($id,['state'=>$updatedData]);
+                $newData = $this->stateModel->update($id,['state'=>$updatedData['stateName']]);
                 if($newData){
                     return $this->response->setStatusCode(201)->setJSON([
                         'status'=>true,

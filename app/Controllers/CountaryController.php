@@ -52,7 +52,7 @@ class CountaryController extends BaseController{
             try{
                 $id = decryptId($id);
                 $updatedData = $this->request->getRawInput();
-                $isExist = $this->countaryModel->where(['name'=>$updatedData])->first();
+                $isExist = $this->countaryModel->where(['name'=>$updatedData['countaryName']])->first();
                 if($isExist) return $this->response->setStatusCode(400)->setJSON([
                     'success'=>false,
                     'message'=> "Countary with similar name is exist"
