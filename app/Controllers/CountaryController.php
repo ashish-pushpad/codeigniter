@@ -10,6 +10,7 @@ use Psr\Log\LoggerInterface;
 
 class CountaryController extends BaseController{
         protected  $countaryModel;
+        protected $helpers = ['encryption'];
         public function initController(
             RequestInterface $request,
             ResponseInterface $response, 
@@ -38,7 +39,7 @@ class CountaryController extends BaseController{
                     ]);
                 }
             }catch (\Exception $e){
-                log_message('Error At countary create ',$e->getMessage());
+                log_message('error',$e->getMessage());
                 return $this->response->setStatusCode(500)->setJSON([
                     "status"=>false,
                     "message"=>"Server Error"
@@ -49,6 +50,7 @@ class CountaryController extends BaseController{
 
         public function updateCountary($id){
             try{
+                $id = decryptId($id);
                 $updatedData = $this->request->getRawInput();
                 $isExist = $this->countaryModel->where(['name'=>$updatedData])->first();
                 if($isExist) return $this->response->setStatusCode(400)->setJSON([
@@ -65,7 +67,7 @@ class CountaryController extends BaseController{
                 }
 
             }catch(\Exception  $e){
-                log_message("Error to updateCountary ",$e->getMessage());
+                log_message("error",$e->getMessage());
                 return $this->response->setStatusCode(500)->setJSON([
                     'success'=>false,
                     'message'=>"Internal Server Error"
@@ -77,14 +79,14 @@ class CountaryController extends BaseController{
         public function getCountries() {
             try{
                 $allCountary = $this->countaryModel->findAll();
-
+                    $allCountary=encryptIds($allCountary);
                     return $this->response->setStatusCode(200)->setJSON([
                         "data"=>$allCountary,
                         'success'=>true
                     ]);
             
             }catch(\Exception $e){
-                log_message("Error to getCountaryByCountry ",$e.getMessage());
+                log_message("error",$e->getMessage());
                 return $this->response->setStatusCode(500)->setJSON([
                     'status'=>false,
                     'message'=>"Internal Server Error"
@@ -94,7 +96,7 @@ class CountaryController extends BaseController{
 
 
         public function deleteCountary($id){
-            try{
+            try{$id = decryptId($id);
                 $country = $this->countaryModel->find($id);
                 if(!$country) return $this->response->setStatusCode(404)->setJSON([
                     "success"=>false,
@@ -110,7 +112,7 @@ class CountaryController extends BaseController{
                 ]);
 
             }catch(\Exception $e){
-                log_message("Error to Delete the Countary ",$e->getMessage());
+                log_message("error",$e->getMessage());
                 return $this->response->setStatusCode(500)->setJSON([
                     'success'=>false,
                     'message'=>"Internal Server Error Try Again Later !!"
