@@ -7,7 +7,7 @@ use App\Models\UserModel;
 class UserController extends BaseController
 {
     public function save()
-    {   log_message('info', 'Saving user data');
+    {   
         try {
             $userModel = new UserModel();
 
