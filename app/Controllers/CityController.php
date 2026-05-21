@@ -22,9 +22,10 @@ class CityController extends BaseController{
 
 
         public function addCity(){
-            try{
-                $cityName= $this->request->getPost("name");
-                $state_id = $this->request->getPost('state_id');
+            try{ 
+                $data = $this->request->getJSON(true);
+                $cityName= $data["name"];
+                $state_id = $data['state_id'];
                 $state_id = decryptId($state_id);
                 $result = $this->cityModel->insert(['name'=>$cityName,'state_id'=>$state_id]);
 
@@ -47,7 +48,7 @@ class CityController extends BaseController{
         public function updateCity($id){
             try{
                 $id = decryptId($id);
-                $updatedData = $this->request->getRawInput();
+                $updatedData = $this->request->getJSON(true);
 
                 $newData = $this->cityModel->update($id,['name'=>$updatedData['updatedCityName']]);
                 if($newData){
@@ -104,7 +105,7 @@ class CityController extends BaseController{
                 return $this->response->setStatusCode(200)->setJSON([
                     'success'=>true,
                     'message'=>'data deleted successfully',
-                    'data'=> $isDeleted
+                    'data'=> $isDelete
                 ]);
 
             }catch(\Exception $e){

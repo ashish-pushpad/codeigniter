@@ -40,12 +40,16 @@ class CreateCityTable extends Migration{
             $this->forge->addForeignKey(
                 'state_id',
                 'states',
-                'id'
+                'id',
+                'CASCADE',
+                'CASCADE'
                 );
             $this->forge->addForeignKey(
                 'added_by',
                 'users',
-                'id'
+                'id',
+                'CASCADE',
+                'CASCADE'
             );
             $this->forge->createTable('cities');
      }

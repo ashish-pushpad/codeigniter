@@ -23,9 +23,17 @@ class StateController extends BaseController{
 
         public function addState(){
             try{
-                $stateName= $this->request->getPost("satateName");
-                $countary_id = $this->request->getPost('countary_id');
+                $data = $this->request->getJSON(true);
+                $stateName = $data['stateName'] ?? null;    
+                $countary_id = $data['country_id'] ?? null;
+
+                if(!$stateName||!$countary_id) return $this->response->setStatusCode(400)->setJSON([
+                        'status'=> false,
+                        'message'=> "State Name And Id require"
+                    ]);
+
                 $countary_id = decryptId($countary_id);
+                log_message('debug',$countary_id);
                 $result = $this->stateModel->insert(['state'=>$stateName,'country_id'=>$countary_id]);
 
                 if($result){
@@ -47,7 +55,7 @@ class StateController extends BaseController{
         public function updateState($id){
             try{
                 $id = decryptId($id);
-                $updatedData = $this->request->getRawInput();
+                $updatedData = $this->request->getJSON(true);
 
                 $newData = $this->stateModel->update($id,['state'=>$updatedData['stateName']]);
                 if($newData){

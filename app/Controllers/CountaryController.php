@@ -24,8 +24,16 @@ class CountaryController extends BaseController{
 
         public function addCountary(){
             try{
-                $countaryName= $this->request->getPost("countaryName");
-                $isExist = $this->countaryModel->where(['name'=>$countaryName])->first();
+                $data = $this->request->getJSON(true);
+                $countaryName = $data['countaryName'] ?? null;
+
+                if (!$countaryName) {
+                    return $this->response->setStatusCode(400)->setJSON([
+                        'success' => false,
+                        'message' => 'Country name is required'
+                    ]);
+                }
+                        $isExist = $this->countaryModel->where(['name'=>$countaryName])->first();
                 if($isExist) return $this->response->setStatusCode(400)->setJSON([
                     'success'=>false,
                     'message'=>"Countary with similar name is exist"
@@ -51,14 +59,14 @@ class CountaryController extends BaseController{
         public function updateCountary($id){
             try{
                 $id = decryptId($id);
-                $updatedData = $this->request->getRawInput();
+                $updatedData = $this->request->getJSON(true);
                 $isExist = $this->countaryModel->where(['name'=>$updatedData['countaryName']])->first();
                 if($isExist) return $this->response->setStatusCode(400)->setJSON([
                     'success'=>false,
                     'message'=> "Countary with similar name is exist"
                 ]);
 
-                $newData = $this->countaryModel->update($id,['name'=>$updatedData]);
+                $newData = $this->countaryModel->update($id,['name'=>$updatedData['countaryName']]);
                 if($newData){
                     return $this->response->setStatusCode(200)->setJSON([
                         'status'=>true,
